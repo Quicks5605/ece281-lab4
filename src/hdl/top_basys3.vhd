@@ -90,19 +90,86 @@ entity top_basys3 is
 end top_basys3;
 
 architecture top_basys3_arch of top_basys3 is 
-  
+ 
+     
 	-- declare components and signals
-
+	component elevator_controller_fsm is
+	       Port ( i_clk     : in  STD_LOGIC;
+           i_reset   : in  STD_LOGIC;
+           i_stop    : in  STD_LOGIC;
+           i_up_down : in  STD_LOGIC;
+           o_floor   : out STD_LOGIC_VECTOR (3 downto 0)           
+           );
+    end component elevator_controller_fsm;
+    
+    component sevenSegDecoder is
+        Port ( i_D : in STD_LOGIC_VECTOR (3 downto 0);
+               o_S : out STD_LOGIC_VECTOR (6 downto 0)
+               );
+    end component sevenSegDecoder;
+    
+    component clock_divider is
+        generic ( constant k_DIV : natural := 2	); -- How many clk cycles until slow clock toggles
+                                                   -- Effectively, you divide the clk double this 
+                                                   -- number (e.g., k_DIV := 2 --> clock divider of 4)
+        port (  i_clk    : in std_logic;
+                i_reset  : in std_logic;           -- asynchronous
+                o_clk    : out std_logic           -- divided (slow) clock
+        );
+    end component clock_divider;
+signal w_floor : std_logic_vector;
+signal w_clk : std_logic;
+signal w_reset1 : std_logic;
+signal w_reset2 : std_logic;
   
 begin
 	-- PORT MAPS ----------------------------------------
+  clkdiv_inst : clock_divider  		--instantiation of clock_divider 
+     Generic map ( k_DIV => 25000000 ) -- 1 Hz clock from 100 MHz
+     Port map (                          
+            i_clk   => clk,
+            i_reset => w_reset2,
+            o_clk   => w_clk
+            ); 
+  
+ele_ctrl_inst : elevator_controller_fsm --instantiation of elevator controller 
+     Port map ( 
+            i_clk => w_clk,
+            i_reset   => w_reset1,
+            i_stop    => sw(0),
+            i_up_down => sw(1),
+            o_floor   => w_floor     
+            );
+           
+sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
+     Port map ( 
+            i_D => w_floor,
+            o_S => seg
+            );
 
-	
-	
+
+
 	-- CONCURRENT STATEMENTS ----------------------------
-	
+	w_reset1 <= btnR or btnU;
+	w_reset2 <= btnL or btnU;
 	-- LED 15 gets the FSM slow clock signal. The rest are grounded.
-	
+	led(15) <= w_clk; --not sure about this one, you should check
+	led(14) <= '0';
+	led(13) <= '0';
+	led(12) <= '0';
+    led(11) <= '0';
+    led(10) <= '0';
+    led(9) <= '0';
+    led(8) <= '0';
+    led(7) <= '0';
+    led(6) <= '0';
+    led(5) <= '0';
+    led(4) <= '0';
+    led(3) <= '0';
+    led(2) <= '0';
+    led(1) <= '0';
+    led(0) <= '0';
+    
 
 	-- leave unused switches UNCONNECTED. Ignore any warnings this causes.
 	
