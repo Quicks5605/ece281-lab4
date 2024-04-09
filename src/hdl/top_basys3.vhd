@@ -117,7 +117,22 @@ architecture top_basys3_arch of top_basys3 is
                 o_clk    : out std_logic           -- divided (slow) clock
         );
     end component clock_divider;
-signal w_floor : std_logic_vector;
+    
+    --future implementation of TDM component here
+    --component TDM4 is
+        --generic ( constant k_WIDTH : natural  := 4); -- bits in input and output
+        --Port ( i_clk        : in  STD_LOGIC;
+               --i_reset        : in  STD_LOGIC; -- asynchronous
+               --i_D3         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               --i_D2         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               --i_D1         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               --i_D0         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               --o_data        : out STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               --o_sel        : out STD_LOGIC_VECTOR (3 downto 0)    -- selected data line (one-cold)
+        --);
+    --end TDM4;
+    
+signal w_floor : std_logic_vector(3 downto 0);
 signal w_clk : std_logic;
 signal w_reset1 : std_logic;
 signal w_reset2 : std_logic;
@@ -125,7 +140,7 @@ signal w_reset2 : std_logic;
 begin
 	-- PORT MAPS ----------------------------------------
   clkdiv_inst : clock_divider  		--instantiation of clock_divider 
-     Generic map ( k_DIV => 25000000 ) -- 1 Hz clock from 100 MHz
+     Generic map ( k_DIV => 25000000 ) -- 2 Hz clock from 100 MHz
      Port map (                          
             i_clk   => clk,
             i_reset => w_reset2,
@@ -147,11 +162,22 @@ sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
             o_S => seg
             );
 
-
+--TDM4_inst : TDM4
+    --Port map (
+        --i_clk	=> , --still needs to be finished in advanced version of elevator
+        --i_reset => ,
+        --i_D3 => ,
+        --i_D2 => ,
+        --i_D1 => ,
+        --i_D0 => ,
+        --o_data => ,
+        --o_sel => 
+        --);
 
 	-- CONCURRENT STATEMENTS ----------------------------
 	w_reset1 <= btnR or btnU;
 	w_reset2 <= btnL or btnU;
+	
 	-- LED 15 gets the FSM slow clock signal. The rest are grounded.
 	led(15) <= w_clk; --not sure about this one, you should check
 	led(14) <= '0';
@@ -170,10 +196,17 @@ sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
     led(1) <= '0';
     led(0) <= '0';
     
-
+    --led <= (15 => w_clk, others => '0'); --simplifier was of writing the above for led, will see if works 
+	
 	-- leave unused switches UNCONNECTED. Ignore any warnings this causes.
 	
 	-- wire up active-low 7SD anodes (an) as required
+	an(0) <= '1';
+	an(1) <= '1';
+	an(2) <= '0';
+	an(3) <= '1';
+	
+	--an <= (2 => '0', others => '1'); --simplifier was of writing the above for an, will see if works
 	-- Tie any unused anodes to power ('1') to keep them off
 	
 end top_basys3_arch;
