@@ -177,7 +177,8 @@ sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
 	-- CONCURRENT STATEMENTS ----------------------------
 	w_reset1 <= btnR or btnU;
 	w_reset2 <= btnL or btnU;
-	
+
+                       
 	-- LED 15 gets the FSM slow clock signal. The rest are grounded.
 	led(15) <= w_clk; --not sure about this one, you should check
 	led(14) <= '0';
