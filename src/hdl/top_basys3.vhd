@@ -98,7 +98,8 @@ architecture top_basys3_arch of top_basys3 is
            i_reset   : in  STD_LOGIC;
            i_stop    : in  STD_LOGIC;
            i_up_down : in  STD_LOGIC;
-           o_floor   : out STD_LOGIC_VECTOR (3 downto 0)           
+           o_floor0   : out STD_LOGIC_VECTOR (3 downto 0);
+           o_floor1   : out STD_LOGIC_VECTOR (3 downto 0)           
            );
     end component elevator_controller_fsm;
     
@@ -119,21 +120,19 @@ architecture top_basys3_arch of top_basys3 is
     end component clock_divider;
     
     --future implementation of TDM component here
-    --component TDM4 is
-        --generic ( constant k_WIDTH : natural  := 4); -- bits in input and output
-        --Port ( i_clk        : in  STD_LOGIC;
-               --i_reset        : in  STD_LOGIC; -- asynchronous
-               --i_D3         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
-               --i_D2         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
-               --i_D1         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
-               --i_D0         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
-               --o_data        : out STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
-               --o_sel        : out STD_LOGIC_VECTOR (3 downto 0)    -- selected data line (one-cold)
-        --);
-    --end TDM4;
+    component TDM4 is
+        generic ( constant k_WIDTH : natural  := 7); -- bits in input and output
+        Port ( i_clk        : in  STD_LOGIC;
+               i_reset        : in  STD_LOGIC; -- asynchronous
+               i_D1         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               i_D0         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               o_data        : out STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
+               o_sel        : out STD_LOGIC    -- selected data line (one-cold)
+        );
+    end component TDM4;
     
-signal w_floor : std_logic_vector(3 downto 0);
-signal w_clk : std_logic;
+signal w_floor0, w_floor1, w_floor: std_logic_vector(3 downto 0);
+signal w_clk, w_sel : std_logic;
 signal w_reset1 : std_logic;
 signal w_reset2 : std_logic;
   
@@ -153,7 +152,8 @@ ele_ctrl_inst : elevator_controller_fsm --instantiation of elevator controller
             i_reset   => w_reset1,
             i_stop    => sw(0),
             i_up_down => sw(1),
-            o_floor   => w_floor     
+            o_floor0   => w_floor0,
+            o_floor1 => w_floor1     
             );
            
 sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
@@ -162,17 +162,15 @@ sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
             o_S => seg
             );
 
---TDM4_inst : TDM4
-    --Port map (
-        --i_clk	=> , --still needs to be finished in advanced version of elevator
-        --i_reset => ,
-        --i_D3 => ,
-        --i_D2 => ,
-        --i_D1 => ,
-        --i_D0 => ,
-        --o_data => ,
-        --o_sel => 
-        --);
+TDM4_inst : TDM4
+    Port map (
+        i_clk	=> w_clk, --still needs to be finished in advanced version of elevator
+        i_reset => btnU, --maybe not, please check future Quick
+        i_D1 => w_floor1,
+        i_D0 => w_floor0,
+        o_data => w_floor,
+        o_sel => w_sel
+        );
 
 	-- CONCURRENT STATEMENTS ----------------------------
 	w_reset1 <= btnR or btnU;
@@ -204,10 +202,11 @@ sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
 	-- wire up active-low 7SD anodes (an) as required
 	an(0) <= '1';
 	an(1) <= '1';
-	an(2) <= '0';
-	an(3) <= '1';
+	an(2) <= '0' when w_sel = '1' else '1';
+	an(3) <= '0' when w_sel = '0' else '1';
 	
 	--an <= (2 => '0', others => '1'); --simplifier was of writing the above for an, will see if works
+	--an <= (2 => '0' when o_sel_n = '0'), (3 => '0' when o_sel_n = '1') others => '1'
 	-- Tie any unused anodes to power ('1') to keep them off
 	
 end top_basys3_arch;
