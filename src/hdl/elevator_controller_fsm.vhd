@@ -101,12 +101,35 @@ begin
     f_Q_next <= s_floor2 when (i_up_down = '1' and f_Q = s_floor1) else -- going up
                 s_floor3 when (i_up_down = '1' and f_Q = s_floor2) else
                 s_floor4 when (i_up_down = '1' and f_Q = s_floor3) else
-                --add other floors
+                s_floor5 when (i_up_down = '1' and f_Q = s_floor4) else
+                s_floor6 when (i_up_down = '1' and f_Q = s_floor5) else
+                s_floor7 when (i_up_down = '1' and f_Q = s_floor6) else
+                s_floor8 when (i_up_down = '1' and f_Q = s_floor7) else
+                s_floor9 when (i_up_down = '1' and f_Q = s_floor8) else
+                s_floor10 when (i_up_down = '1' and f_Q = s_floor9) else
+                s_floor11 when (i_up_down = '1' and f_Q = s_floor10) else
+                s_floor12 when (i_up_down = '1' and f_Q = s_floor11) else
+                s_floor13 when (i_up_down = '1' and f_Q = s_floor12) else
+                s_floor14 when (i_up_down = '1' and f_Q = s_floor13) else
+                s_floor15 when (i_up_down = '1' and f_Q = s_floor14) else
+                s_floor16 when (i_up_down = '1' and f_Q = s_floor15) else
                 
-                s_floor3 when (i_up_down = '0' and f_Q = s_floor4) else -- going down
+
+                s_floor15 when (i_up_down = '0' and f_Q = s_floor16) else -- going down
+                s_floor14 when (i_up_down = '0' and f_Q = s_floor15) else
+                s_floor13 when (i_up_down = '0' and f_Q = s_floor14) else
+                s_floor12 when (i_up_down = '0' and f_Q = s_floor13) else
+                s_floor11 when (i_up_down = '0' and f_Q = s_floor12) else
+                s_floor10 when (i_up_down = '0' and f_Q = s_floor11) else
+                s_floor9 when (i_up_down = '0' and f_Q = s_floor10) else
+                s_floor8 when (i_up_down = '0' and f_Q = s_floor9) else
+                s_floor7 when (i_up_down = '0' and f_Q = s_floor8) else
+                s_floor6 when (i_up_down = '0' and f_Q = s_floor7) else
+                s_floor5 when (i_up_down = '0' and f_Q = s_floor6) else
+                s_floor4 when (i_up_down = '0' and f_Q = s_floor5) else
+                s_floor3 when (i_up_down = '0' and f_Q = s_floor4) else 
                 s_floor2 when (i_up_down = '0' and f_Q = s_floor3) else
                 s_floor1 when (i_up_down = '0' and f_Q = s_floor2) else
-                --add other floors
                 f_Q; -- default case --or f_Q = f_Q
   
 	-- Output logic
