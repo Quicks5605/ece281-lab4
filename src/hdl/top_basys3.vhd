@@ -121,7 +121,7 @@ architecture top_basys3_arch of top_basys3 is
     
     --future implementation of TDM component here
     component TDM4 is
-        generic ( constant k_WIDTH : natural  := 7); -- bits in input and output
+        generic ( constant k_WIDTH : natural  := 4); -- bits in input and output
         Port ( i_clk        : in  STD_LOGIC;
                i_reset        : in  STD_LOGIC; -- asynchronous
                i_D1         : in  STD_LOGIC_VECTOR (k_WIDTH - 1 downto 0);
@@ -132,20 +132,26 @@ architecture top_basys3_arch of top_basys3 is
     end component TDM4;
     
 signal w_floor0, w_floor1, w_floor: std_logic_vector(3 downto 0);
-signal w_clk, w_sel : std_logic;
+signal w_clk,w_clk2, w_sel : std_logic;
 signal w_reset1 : std_logic;
 signal w_reset2 : std_logic;
   
 begin
 	-- PORT MAPS ----------------------------------------
   clkdiv_inst : clock_divider  		--instantiation of clock_divider 
-     Generic map ( k_DIV => 25000000 ) -- 2 Hz clock from 100 MHz
+     Generic map ( k_DIV => 25000000 ) -- 1 Hz clock from 100 MHz
      Port map (                          
             i_clk   => clk,
             i_reset => w_reset2,
             o_clk   => w_clk
             ); 
-  
+  clkdiv_inst2 : clock_divider  		--instantiation of clock_divider 
+      Generic map ( k_DIV => 50000 ) -- 1000 Hz clock from 100 MHz
+      Port map (                          
+             i_clk   => clk,
+             i_reset => w_reset2,
+             o_clk   => w_clk2
+             );
 ele_ctrl_inst : elevator_controller_fsm --instantiation of elevator controller 
      Port map ( 
             i_clk => w_clk,
@@ -164,7 +170,7 @@ sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
 
 TDM4_inst : TDM4
     Port map (
-        i_clk	=> w_clk, --still needs to be finished in advanced version of elevator
+        i_clk	=> w_clk2, --still needs to be finished in advanced version of elevator
         i_reset => btnU, --maybe not, please check future Quick
         i_D1 => w_floor1,
         i_D0 => w_floor0,
