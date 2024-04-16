@@ -66,7 +66,7 @@ end TDM4;
 
 architecture behavioral of TDM4 is
 
-	signal   f_sel		 : unsigned	:= "0"; -- 1 bit counter output to select MUX input
+	signal   f_sel		 : Std_logic	:= '0'; -- 1 bit counter output to select MUX input
 	
 begin	
 	
@@ -74,13 +74,13 @@ begin
 	
 	-- 2 Bit counter Process ----------------------------
 	-- counter rolls over automatically
-	-- asynchronous reset to "00"
+	-- asynchronous reset to "0"
 	twoBitCounter_proc : process(i_clk, i_reset)
 	begin
 		if i_reset = '1' then
-			f_sel <= "0";
+			f_sel <= '0';
 		elsif rising_edge(i_clk) then
-			f_sel <= f_sel + 1;
+			f_sel <= not f_sel;
 		end if;
 	end process twoBitCounter_proc;
 	-----------------------------------------------------
@@ -89,9 +89,9 @@ begin
 	-- CONCURRENT STATEMENTS ----------------------------
 	
 	-- output MUXs
-	o_DATA <= i_D1 when f_sel = "1" else i_D0;
+	o_DATA <= i_D1 when f_sel = '1' else i_D0;
 			  
-	o_SEL  <=  '1' when f_sel = "1" else '0';
+	o_SEL  <=  '1' when f_sel = '1' else '0';
 		
 end behavioral;
 

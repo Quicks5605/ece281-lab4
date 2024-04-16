@@ -171,7 +171,7 @@ sevSeg_inst : sevenSegDecoder --instantiation of seven Seg
 TDM4_inst : TDM4
     Port map (
         i_clk	=> w_clk2, --still needs to be finished in advanced version of elevator
-        i_reset => btnU, --maybe not, please check future Quick
+        i_reset => btnU, 
         i_D1 => w_floor1,
         i_D0 => w_floor0,
         o_data => w_floor,
@@ -208,8 +208,8 @@ TDM4_inst : TDM4
 	-- wire up active-low 7SD anodes (an) as required
 	an(0) <= '1';
 	an(1) <= '1';
-	an(2) <= '0' when w_sel = '1' else '1';
-	an(3) <= '0' when w_sel = '0' else '1';
+	an(2) <= not w_sel;
+	an(3) <= w_sel;
 	
 	--an <= (2 => '0', others => '1'); --simplifier was of writing the above for an, will see if works
 	--an <= (2 => '0' when o_sel_n = '0'), (3 => '0' when o_sel_n = '1') others => '1'
