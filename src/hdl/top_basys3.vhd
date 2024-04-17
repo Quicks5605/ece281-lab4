@@ -132,7 +132,7 @@ architecture top_basys3_arch of top_basys3 is
     end component TDM4;
     
 signal w_floor0, w_floor1, w_floor: std_logic_vector(3 downto 0);
-signal w_clk,w_clk2, w_sel : std_logic;
+signal w_clk1,w_clk2, w_sel : std_logic;
 signal w_reset1 : std_logic;
 signal w_reset2 : std_logic;
   
@@ -143,7 +143,7 @@ begin
      Port map (                          
             i_clk   => clk,
             i_reset => w_reset2,
-            o_clk   => w_clk
+            o_clk   => w_clk1
             ); 
   clkdiv_inst2 : clock_divider  		--instantiation of clock_divider 
       Generic map ( k_DIV => 50000 ) -- 1000 Hz clock from 100 MHz
@@ -154,7 +154,7 @@ begin
              );
 ele_ctrl_inst : elevator_controller_fsm --instantiation of elevator controller 
      Port map ( 
-            i_clk => w_clk,
+            i_clk => w_clk1,
             i_reset   => w_reset1,
             i_stop    => sw(0),
             i_up_down => sw(1),
@@ -184,7 +184,7 @@ TDM4_inst : TDM4
 
                        
 	-- LED 15 gets the FSM slow clock signal. The rest are grounded.
-	led(15) <= w_clk; --not sure about this one, you should check
+	led(15) <= w_clk1; --not sure about this one, you should check
 	led(14) <= '0';
 	led(13) <= '0';
 	led(12) <= '0';
@@ -209,7 +209,7 @@ TDM4_inst : TDM4
 	an(0) <= '1';
 	an(1) <= '1';
 	an(2) <= not w_sel;
-	an(3) <= w_sel;
+	an(3) <= w_sel; --btnU or w_sel;
 	
 	--an <= (2 => '0', others => '1'); --simplifier was of writing the above for an, will see if works
 	--an <= (2 => '0' when o_sel_n = '0'), (3 => '0' when o_sel_n = '1') others => '1'
